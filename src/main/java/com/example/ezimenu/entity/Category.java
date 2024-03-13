@@ -16,6 +16,10 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @ManyToOne
+    @JoinColumn(name = "eatery_id")
+    private Eatery eatery;
+
     @Column(name = "name")
     private String name;
 }

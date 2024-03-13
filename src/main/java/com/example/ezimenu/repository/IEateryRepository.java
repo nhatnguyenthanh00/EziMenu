@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface IEateryRepository extends JpaRepository<Eatery, Integer> {
-    List<Eatery> findAllByUserId(int userid);
-
+    List<Eatery> findAllByUserId(int userId);
     Eatery findById(int id);
 }

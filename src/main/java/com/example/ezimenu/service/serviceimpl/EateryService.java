@@ -18,8 +18,8 @@ public class EateryService implements IEateryService {
     }
 
     @Override
-    public List<Eatery> findAllByUserId(int userid){
-        return eateryRepository.findAllByUserId(userid);
+    public List<Eatery> findAllByUserId(int userId){
+        return eateryRepository.findAllByUserId(userId);
     }
 
     @Override

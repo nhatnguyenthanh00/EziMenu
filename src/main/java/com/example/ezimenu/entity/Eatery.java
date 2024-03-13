@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table
 @Getter
@@ -25,5 +27,8 @@ public class Eatery {
     private String address;
     @Column(name = "description")
     private String description;
+
+    @OneToMany(mappedBy = "eatery",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> categoryList;
 
 }

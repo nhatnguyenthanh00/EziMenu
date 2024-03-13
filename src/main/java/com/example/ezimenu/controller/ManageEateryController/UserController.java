@@ -40,19 +40,22 @@ public class UserController {
     }
 
     @GetMapping(value = "/eatery/{id}")
-    public ResponseEntity<EateryDto> getEateryById(@PathVariable int id){
+    public ResponseEntity<?> getEateryById(@PathVariable int id){
         Eatery eatery = eateryService.findById(id);
-        EateryDto eateryDto = new EateryDto();
         if(eatery==null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(eateryDto);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Id not existed.");
         }
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if(eatery.getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        }
+        EateryDto eateryDto = new EateryDto();
         eateryDto.setId(eatery.getId());
         eateryDto.setUserId(eatery.getUser().getId());
         eateryDto.setAddress(eatery.getAddress());
         eateryDto.setDescription(eatery.getDescription());
         return ResponseEntity.status(HttpStatus.OK).body(eateryDto);
-//        if(eatery == null)
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Eatery dón't existed.");
     }
 
     @PostMapping(value = "/add-eatery")
