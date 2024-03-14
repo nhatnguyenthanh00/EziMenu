@@ -1,5 +1,6 @@
 package com.example.ezimenu.entity;
 
+import com.example.ezimenu.dto.DishDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,13 +17,23 @@ public class Dish {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne
-    @JoinColumn(name = "eatery_id")
-    private Eatery eatery;
-    @Column(name = "category_id")
-    private int categoryId;
+    @JoinColumn(name = "category_id")
+    private Category category;
     @Column(name = "name")
     private String name;
     @Column(name = "price")
     private double price;
+    @Column(name = "status")
+    private boolean status;
+
+    public DishDto toDto(){
+        DishDto dishDto = new DishDto();
+        dishDto.setId(this.getId());
+        dishDto.setCategoryId(this.getCategory().getId());
+        dishDto.setName(this.getName());
+        dishDto.setPrice(this.getPrice());
+        dishDto.setStatus(this.isStatus());
+        return dishDto;
+    }
 
 }

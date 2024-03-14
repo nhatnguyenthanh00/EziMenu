@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,4 +24,7 @@ public class Category {
 
     @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Dish> dishList;
 }
