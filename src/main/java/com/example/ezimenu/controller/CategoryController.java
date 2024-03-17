@@ -62,7 +62,7 @@ public class CategoryController {
         categoryDto.setName(category.getName());
         return ResponseEntity.ok(categoryDto);
     }
-    @PostMapping(value = "/eatery/{id}/add-category")
+    @PostMapping(value = "/eatery/{id}/category/add")
     public ResponseEntity<?> addCategory(@PathVariable int id, @RequestBody Category category){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");

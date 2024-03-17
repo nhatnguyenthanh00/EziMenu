@@ -10,4 +10,9 @@ import java.util.List;
 public interface IDishRepository extends JpaRepository<Dish, Integer> {
     @Query("SELECT d FROM Dish d JOIN d.category c JOIN c.eatery e WHERE e.id = :eateryId")
     List<Dish> findAllByEateryId(@Param("eateryId") int eateryId);
+
+    @Query("SELECT d FROM Dish d JOIN d.category c  WHERE c.id = :categoryId")
+    List<Dish> findAllByCategoryId(@Param("categoryId") int categoryId);
+
+    Dish findById(int id);
 }

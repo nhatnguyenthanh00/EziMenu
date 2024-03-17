@@ -7,4 +7,10 @@ import java.util.List;
 public interface IDishService {
 
     List<Dish> findAllByEateryId(int eateryId);
+
+    List<Dish> findAllByCategoryId(int categoryId);
+
+    Dish findById(int id);
+
+    Dish saveDish(Dish dish);
 }

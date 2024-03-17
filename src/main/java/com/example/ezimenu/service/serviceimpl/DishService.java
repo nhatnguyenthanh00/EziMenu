@@ -17,4 +17,19 @@ public class DishService implements IDishService {
     public List<Dish> findAllByEateryId(int eateryId){
         return dishRepository.findAllByEateryId(eateryId);
     }
+
+    @Override
+    public List<Dish> findAllByCategoryId(int categoryId){
+        return dishRepository.findAllByCategoryId(categoryId);
+    }
+
+    @Override
+    public Dish findById(int id){
+        return dishRepository.findById(id);
+    }
+
+    @Override
+    public Dish saveDish(Dish dish){
+        return dishRepository.save(dish);
+    }
 }
