@@ -20,7 +20,7 @@ public class DishDto {
     private int id;
     private int categoryId;
     private String name;
-    private double price;
+    private int price;
     private boolean status;
 
 }

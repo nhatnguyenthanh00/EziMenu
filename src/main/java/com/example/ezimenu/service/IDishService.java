@@ -13,4 +13,6 @@ public interface IDishService {
     Dish findById(int id);
 
     Dish saveDish(Dish dish);
+
+    boolean deleteById(int id);
 }

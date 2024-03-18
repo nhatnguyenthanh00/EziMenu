@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,10 +25,12 @@ public class Dish {
     @Column(name = "name")
     private String name;
     @Column(name = "price")
-    private double price;
+    private int price;
     @Column(name = "status")
-    private boolean status;
+    private boolean status = true;
 
+    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItemList;
     public DishDto toDto(){
         DishDto dishDto = new DishDto();
         dishDto.setId(this.getId());

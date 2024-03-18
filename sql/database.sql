@@ -36,9 +36,39 @@ CREATE TABLE `dish` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `category_id` INT,
     `name` VARCHAR(255),
-    `price` DOUBLE,
-    `status` BOOLEAN,
+    `price` INT,
+    `status` BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (`category_id`) REFERENCES `ezimenu_db`.`category`(`id`)
+);
+
+-- Tạo bảng TableDinner
+CREATE TABLE `table_dinner` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `eatery_id` INT,
+    `status` BOOLEAN DEFAULT TRUE,
+    `description` VARCHAR(255),
+    FOREIGN KEY (`eatery_id`) REFERENCES `ezimenu_db`.`eatery`(`id`)
+);
+
+-- Tạo bảng Order
+CREATE TABLE `order_table` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `table_dinner_id` INT,
+    `description` VARCHAR(255),
+    `status` INT DEFAULT -1,
+    `total_price` INT DEFAULT 0,
+    FOREIGN KEY (`table_dinner_id`) REFERENCES `ezimenu_db`.`table_dinner`(`id`)
+);
+
+-- Tạo bảng OrderItem
+CREATE TABLE `order_item` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `order_id` INT,
+    `dish_id` INT,
+    `quantity` INT DEFAULT 0,
+    `status` BOOLEAN DEFAULT false,
+    FOREIGN KEY (`order_id`) REFERENCES `ezimenu_db`.`order_table`(`id`),
+    FOREIGN KEY (`dish_id`) REFERENCES `ezimenu_db`.`dish`(`id`)
 );
 
 -- Chèn dữ liệu mẫu
@@ -69,4 +99,25 @@ INSERT INTO `ezimenu_db`.`dish` (`category_id`, `name`, `price`, `status`) VALUE
 (3, 'Cánh Gà rán', 40000, true),
 (4, 'Coca', 15000, true),
 (4, 'Nước lọc', 5000, true);
+
+-- Chèn dữ liệu mẫu vào bảng TableDinner
+INSERT INTO `ezimenu_db`.`table_dinner` (`eatery_id`, `status`, `description`) VALUES
+(1, true, 'Bàn số 1 - Phòng VIP'),
+(1, true, 'Bàn số 2 - Phòng VIP'),
+(1, true, 'Bàn số 3 - Phòng thường'),
+(2, true, 'Bàn số 1 - Góc nhà'),
+(2, true, 'Bàn số 2 - Góc nhà');
+
+-- Chèn dữ liệu mẫu vào bảng Order
+INSERT INTO `ezimenu_db`.`order_table` (`table_dinner_id`, `description`, `status`, `total_price`) VALUES
+(1, 'Đơn hàng số 1', -1, 0),
+(2, 'Đơn hàng số 2', -1, 0),
+(3, 'Đơn hàng số 3', -1, 0);
+
+-- Chèn dữ liệu mẫu vào bảng OrderItem
+INSERT INTO `ezimenu_db`.`order_item` (`order_id`, `dish_id`, `quantity`, `status`) VALUES
+(1, 1, 2, false),
+(1, 2, 1, false),
+(2, 3, 2, false),
+(2, 4, 5, false);
 

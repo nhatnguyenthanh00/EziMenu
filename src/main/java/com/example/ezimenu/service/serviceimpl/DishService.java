@@ -32,4 +32,11 @@ public class DishService implements IDishService {
     public Dish saveDish(Dish dish){
         return dishRepository.save(dish);
     }
+
+    public boolean deleteById(int id){
+        Dish dish = dishRepository.findById(id);
+        if(dish == null) return false;
+        dishRepository.deleteById(id);
+        return true;
+    }
 }

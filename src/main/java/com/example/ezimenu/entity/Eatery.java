@@ -31,4 +31,7 @@ public class Eatery {
     @OneToMany(mappedBy = "eatery",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categoryList;
 
+    @OneToMany(mappedBy = "eatery", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TableDinner> tableDinnerList;
+
 }
