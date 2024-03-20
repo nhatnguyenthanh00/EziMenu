@@ -45,7 +45,7 @@ CREATE TABLE `dish` (
 CREATE TABLE `table_dinner` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `eatery_id` INT,
-    `status` BOOLEAN DEFAULT TRUE,
+    `status` BOOLEAN DEFAULT FALSE,
     `description` VARCHAR(255),
     FOREIGN KEY (`eatery_id`) REFERENCES `ezimenu_db`.`eatery`(`id`)
 );
@@ -69,6 +69,16 @@ CREATE TABLE `order_item` (
     `status` BOOLEAN DEFAULT false,
     FOREIGN KEY (`order_id`) REFERENCES `ezimenu_db`.`order_table`(`id`),
     FOREIGN KEY (`dish_id`) REFERENCES `ezimenu_db`.`dish`(`id`)
+);
+
+-- Tạo bảng Notify
+CREATE TABLE `notify`(
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+     `table_dinner_id` INT,
+     `type` INT,
+     `description` VARCHAR(255),
+     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY (`table_dinner_id`) REFERENCES `ezimenu_db`.`table_dinner`(`id`)
 );
 
 -- Chèn dữ liệu mẫu
@@ -121,3 +131,8 @@ INSERT INTO `ezimenu_db`.`order_item` (`order_id`, `dish_id`, `quantity`, `statu
 (2, 3, 2, false),
 (2, 4, 5, false);
 
+-- Chèn dữ liệu mẫu vào bảng Notify
+INSERT INTO `ezimenu_db`.`notify`(`table_dinner_id`, `type` , `description`) VALUES
+(1,-1,''),
+(1,0,''),
+(1,1,'Làm nhanh giúp em với ạ');

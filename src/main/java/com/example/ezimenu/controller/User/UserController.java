@@ -1,4 +1,4 @@
-package com.example.ezimenu.controller.ManageEateryController;
+package com.example.ezimenu.controller.User;
 
 import com.example.ezimenu.dto.EateryDto;
 import com.example.ezimenu.entity.Eatery;

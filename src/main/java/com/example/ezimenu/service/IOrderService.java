@@ -12,4 +12,6 @@ public interface IOrderService {
     List<Order> findAllByTableDinnerId(int tableDinnerId);
 
     Order saveOrder(Order order);
+
+    boolean deleteById(int id);
 }

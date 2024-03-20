@@ -20,6 +20,10 @@ public class OrderDto {
     private String description;
 
     private int status = -1;
+    // -1 <=> order pending
+    //  0 <=> order sent
+    //  1 <=> order received
+    //  2 <=> order paid
 
     private int totalPrice = 0 ;
 }

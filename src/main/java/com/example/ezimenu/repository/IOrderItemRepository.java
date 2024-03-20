@@ -13,6 +13,9 @@ public interface IOrderItemRepository extends JpaRepository<OrderItem, Integer> 
     OrderItem findById(int id);
 
     @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id = :orderId")
-    List<OrderItem> findAllByOrderId(int orderId);
+    List<OrderItem> findAllByOrderId(@Param("orderId") int orderId);
+
+    @Query(value = "SELECT o FROM OrderItem o WHERE o.order.id = :orderId AND o.dish.id = :dishId")
+    OrderItem findByOrderIdAndDishId(@Param("orderId") int orderId, @Param("dishId") int dishId);
 
 }

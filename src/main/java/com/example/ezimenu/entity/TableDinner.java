@@ -25,13 +25,16 @@ public class TableDinner {
     private Eatery eatery;
 
     @Column(name = "status")
-    private boolean status = true;
+    private boolean status = false;
 
     @Column(name = "description")
     private String description;
 
     @OneToMany(mappedBy = "tableDinner", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<Order> orderList;
+
+    @OneToMany(mappedBy = "tableDinner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notify> notifyList;
 
     public TableDinnerDto toDto(){
         TableDinnerDto tableDinnerDto = new TableDinnerDto();

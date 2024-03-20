@@ -31,4 +31,12 @@ public class OrderService implements IOrderService {
     public Order saveOrder(Order order){
         return orderRepository.save(order);
     }
+
+    @Override
+    public boolean deleteById(int id){
+        Order order = orderRepository.findById(id);
+        if(order == null || order.getStatus()!=-1) return false;
+        orderRepository.deleteById(id);
+        return true;
+    }
 }

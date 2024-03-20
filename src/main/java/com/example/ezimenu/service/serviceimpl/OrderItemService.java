@@ -21,4 +21,23 @@ public class OrderItemService implements IOderItemService {
     public List<OrderItem> findAllByOrderId(int orderId){
         return orderItemRepository.findAllByOrderId(orderId);
     }
+
+    @Override
+    public OrderItem findByOrderIdAndDishId(int orderId, int dishId){
+        return orderItemRepository.findByOrderIdAndDishId(orderId,dishId);
+    }
+
+    @Override
+    public OrderItem saveOrderItem(OrderItem orderItem){
+        return orderItemRepository.save(orderItem);
+    }
+
+    @Override
+    public boolean deleteById(int id){
+        OrderItem orderItem = orderItemRepository.findById(id);
+        if(orderItem == null) return false;
+        if(orderItem.getOrder().getStatus()!=-1) return false;
+        orderItemRepository.deleteById(id);
+        return true;
+    }
 }

@@ -1,15 +1,8 @@
 package com.example.ezimenu.service.transer;
 
-import com.example.ezimenu.dto.DishDto;
-import com.example.ezimenu.dto.OrderDto;
-import com.example.ezimenu.dto.TableDinnerDto;
-import com.example.ezimenu.entity.Dish;
-import com.example.ezimenu.entity.Order;
-import com.example.ezimenu.entity.TableDinner;
-import com.example.ezimenu.service.serviceimpl.CategoryService;
-import com.example.ezimenu.service.serviceimpl.DishService;
-import com.example.ezimenu.service.serviceimpl.EateryService;
-import com.example.ezimenu.service.serviceimpl.TableDinnerService;
+import com.example.ezimenu.dto.*;
+import com.example.ezimenu.entity.*;
+import com.example.ezimenu.service.serviceimpl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +14,10 @@ public class MapperService {
     EateryService eateryService;
     @Autowired
     TableDinnerService tableDinnerService;
+    @Autowired
+    OrderService orderService;
+    @Autowired
+    DishService dishService;
     public Dish toDish(DishDto dishDto){
         Dish dish = new Dish();
         dish.setId(dishDto.getId());
@@ -48,5 +45,20 @@ public class MapperService {
         order.setStatus(orderDto.getStatus());
         order.setTotalPrice(orderDto.getTotalPrice());
         return order;
+    }
+
+    public OrderItem toOrderItem(OrderItemDto orderItemDto){
+        OrderItem orderItem = new OrderItem();
+        orderItem.setId(orderItemDto.getId());
+        orderItem.setQuantity(orderItemDto.getQuantity());
+        orderItem.setStatus(orderItemDto.isStatus());
+        orderItem.setOrder(orderService.findById(orderItemDto.getOrderId()));
+        orderItem.setDish(dishService.findById(orderItemDto.getDishId()));
+        return orderItem;
+    }
+
+    public Notify toNotify(NotifyDto notifyDto){
+        Notify notify = new Notify();
+        return notify;
     }
 }

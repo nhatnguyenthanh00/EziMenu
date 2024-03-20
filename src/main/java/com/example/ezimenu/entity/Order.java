@@ -27,6 +27,10 @@ public class Order {
 
     @Column(name = "status")
     private int status = -1;
+    // -1 <=> order pending
+    //  0 <=> order sent
+    //  1 <=> order received
+    //  2 <=> order paid
 
     @Column(name = "total_price")
     private int totalPrice = 0 ;

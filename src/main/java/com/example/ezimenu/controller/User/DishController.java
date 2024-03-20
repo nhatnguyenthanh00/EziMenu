@@ -1,4 +1,4 @@
-package com.example.ezimenu.controller.ManageDishController;
+package com.example.ezimenu.controller.User;
 
 import com.example.ezimenu.dto.DishDto;
 import com.example.ezimenu.entity.Category;
