@@ -164,7 +164,7 @@ public class GuestController {
         }
         orderItem.setQuantity(quantity);
         orderItemService.saveOrderItem(orderItem);
-        return ResponseEntity.status(HttpStatus.OK).body(orderItemDto);
+        return ResponseEntity.status(HttpStatus.OK).body(orderItem.toDto());
     }
 
     @DeleteMapping(value = "/order-item/{id}/delete")
@@ -177,8 +177,7 @@ public class GuestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't delete because order has sent.");
         }
         boolean kt = orderItemService.deleteById(id);
-        if(kt == false)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't delete because of order has been sent.");
+
         return ResponseEntity.status(HttpStatus.OK).body("Delete order item successful.");
     }
 
