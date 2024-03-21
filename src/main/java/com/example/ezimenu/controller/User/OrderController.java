@@ -131,7 +131,7 @@ public class OrderController {
     }
 
     @PutMapping(value = "/order/{id}/update")
-    public ResponseEntity<?> updateDish(@PathVariable int id,@RequestBody OrderDto orderDto){
+    public ResponseEntity<?> updateOrder(@PathVariable int id,@RequestBody OrderDto orderDto){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         Order order = orderService.findById(id);

@@ -13,4 +13,6 @@ public interface ICategoryService {
 
     boolean deleteById(int id);
 
+    Category findCategoryByEateryIdAndName(int eateryId, String name);
+
 }

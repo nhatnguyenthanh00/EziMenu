@@ -18,6 +18,8 @@ public class MapperService {
     OrderService orderService;
     @Autowired
     DishService dishService;
+    @Autowired
+    UserService userService;
     public Dish toDish(DishDto dishDto){
         Dish dish = new Dish();
         dish.setId(dishDto.getId());
@@ -63,5 +65,20 @@ public class MapperService {
         notify.setDescription(notifyDto.getDescription());
         notify.setTableDinner(tableDinnerService.findById(notifyDto.getTableDinnerId()));
         return notify;
+    }
+
+    public Eatery toEatery(EateryDto eateryDto){
+        Eatery eatery = new Eatery();
+        eatery.setUser(userService.findByUserId(eateryDto.getUserId()));
+        eatery.setAddress(eateryDto.getAddress());
+        eatery.setDescription(eateryDto.getDescription());
+        return eatery;
+    }
+
+    public Category toCategory(CategoryDto categoryDto){
+        Category category = new Category();
+        category.setEatery(eateryService.findById(categoryDto.getEateryId()));
+        category.setName(categoryDto.getName());
+        return category;
     }
 }

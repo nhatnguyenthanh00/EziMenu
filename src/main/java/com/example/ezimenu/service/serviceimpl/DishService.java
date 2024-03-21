@@ -1,5 +1,6 @@
 package com.example.ezimenu.service.serviceimpl;
 
+import com.example.ezimenu.entity.Category;
 import com.example.ezimenu.entity.Dish;
 import com.example.ezimenu.repository.IDishRepository;
 import com.example.ezimenu.service.IDishService;
@@ -38,5 +39,10 @@ public class DishService implements IDishService {
         if(dish == null) return false;
         dishRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public Dish findDishByCategoryAndNameAndPrice(Category category, String name, int price){
+        return dishRepository.findDishByCategoryAndNameAndPrice(category, name, price);
     }
 }

@@ -7,4 +7,6 @@ public interface IUserService {
     User findUserByUsernameAndPassword(String username, String password);
 
     User saveUser(User user);
+
+    User findByUserId(int userId);
 }

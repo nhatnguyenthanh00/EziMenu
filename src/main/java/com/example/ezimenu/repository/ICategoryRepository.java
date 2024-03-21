@@ -12,4 +12,6 @@ public interface ICategoryRepository extends JpaRepository<Category, Integer> {
 
     Category findById(int id);
 
+    Category findCategoryByEatery_IdAndName(int eateryId, String name);
+
 }

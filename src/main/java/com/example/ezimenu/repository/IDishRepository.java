@@ -1,5 +1,6 @@
 package com.example.ezimenu.repository;
 
+import com.example.ezimenu.entity.Category;
 import com.example.ezimenu.entity.Dish;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ public interface IDishRepository extends JpaRepository<Dish, Integer> {
     List<Dish> findAllByCategoryId(@Param("categoryId") int categoryId);
 
     Dish findById(int id);
+
+    Dish findDishByCategoryAndNameAndPrice(Category category, String name , int price);
 }

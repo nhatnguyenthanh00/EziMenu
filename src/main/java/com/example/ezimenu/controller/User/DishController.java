@@ -64,26 +64,35 @@ public class DishController {
         return ResponseEntity.status(HttpStatus.OK).body(dishDtoList);
     }
 
-    @GetMapping(value = "/eatery/{id}/dish/{dishid}")
-    public ResponseEntity<?> getDishById(@PathVariable int id, @PathVariable int dishid){
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
-        Dish dish = dishService.findById(dishid);
+    @GetMapping(value = "/dish/{id}")
+    public ResponseEntity<?> getDishById(@PathVariable int id){
+        Dish dish = dishService.findById(id);
 
-        if(dish==null || dish.getCategory().getEatery().getId()!=id ||dish.getCategory().getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(dish==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found dish.");
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(dish.toDto());
     }
 
-    @PostMapping(value = "/eatery/{id}/dish/add")
-    public ResponseEntity<?> addDish(@PathVariable int id, @RequestBody DishDto dishDto){
+    @PostMapping(value = "/dish/add")
+    public ResponseEntity<?> addDish(@RequestBody DishDto dishDto){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        Eatery eatery = eateryService.findById(id);
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        int categoryId = dishDto.getCategoryId();
+        Category category = categoryService.findById(categoryId);
+        if(category==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found category.");
+        }
+        if(category.getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't access this eatery.");
+        }
+        String name = dishDto.getName();
+        int price = dishDto.getPrice();
+
+        Dish existedDish = dishService.findDishByCategoryAndNameAndPrice(category,name,price);
+        if (existedDish != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dish existed.");
         }
 
         Dish dish = mapperService.toDish(dishDto);
@@ -91,31 +100,52 @@ public class DishController {
         dishDto.setId(dish.getId());
         return ResponseEntity.status(HttpStatus.OK).body(dishDto);
     }
-    @PutMapping(value = "/eatery/{id}/dish/{dishid}/update")
-    public ResponseEntity<?> updateDish(@PathVariable int id,@PathVariable int dishid,@RequestBody DishDto dishDto){
+    @PutMapping(value = "/dish/{dishid}/update")
+    public ResponseEntity<?> updateDish(@PathVariable int dishid,@RequestBody DishDto dishDto){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         Dish dish = dishService.findById(dishid);
-        if(dish == null || dish.getCategory().getEatery().getId()!=id || dish.getCategory().getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(dish==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found dish.");
         }
-        dish.setName(dishDto.getName());
-        dish.setPrice(dishDto.getPrice());
-        dish.setStatus(dishDto.isStatus());
-        dish.setCategory(categoryService.findById(dishDto.getCategoryId()));
+        if(dish.getCategory().getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't access this eatery.");
+        }
+        int categoryId = dishDto.getCategoryId();
+        Category updateCategory = categoryService.findById(categoryId);
+        if(updateCategory==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found category.");
+        }
+        if(updateCategory.getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't access this category.");
+        }
+        String name = dishDto.getName();
+        int price = dishDto.getPrice();
+        boolean status = dishDto.isStatus();
+        Dish existedDish = dishService.findDishByCategoryAndNameAndPrice(updateCategory,name,price);
+        if (existedDish != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dish existed.");
+        }
+        dish.setName(name);
+        dish.setPrice(price);
+        dish.setStatus(status);
+        dish.setCategory(updateCategory);
         dishService.saveDish(dish);
-        return ResponseEntity.status(HttpStatus.OK).body(dishDto);
+        return ResponseEntity.status(HttpStatus.OK).body(dish.toDto());
     }
 
-    @DeleteMapping(value = "/eatery/{id}/dish/{dishid}/delete")
-    public ResponseEntity<?> deleteDish(@PathVariable int id, @PathVariable int dishid){
+    @DeleteMapping(value = "/dish/{id}/delete")
+    public ResponseEntity<?> deleteDish(@PathVariable int id){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        Dish dish = dishService.findById(dishid);
-        if(dish == null || dish.getCategory().getEatery().getId()!=id || dish.getCategory().getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        Dish dish = dishService.findById(id);
+        if(dish == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete fail. Not found dish.");
         }
-        boolean kt = dishService.deleteById(dishid);
+        if(dish.getCategory().getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete fail. You can't access this dish.");
+        }
+        boolean kt = dishService.deleteById(id);
         if(kt == false) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Delete dish fail.");
         return ResponseEntity.status(HttpStatus.OK).body("Delete dish successful.");
     }

@@ -1,5 +1,6 @@
 package com.example.ezimenu.entity;
 
+import com.example.ezimenu.dto.CategoryDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,4 +28,12 @@ public class Category {
 
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Dish> dishList;
+
+    public CategoryDto toDto(){
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(id);
+        categoryDto.setEateryId(eatery.getId());
+        categoryDto.setName(name);
+        return categoryDto;
+    }
 }

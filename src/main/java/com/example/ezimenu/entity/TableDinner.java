@@ -1,5 +1,7 @@
 package com.example.ezimenu.entity;
 
+import com.example.ezimenu.dto.NotifyDto;
+import com.example.ezimenu.dto.OrderDto;
 import com.example.ezimenu.dto.TableDinnerDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -42,6 +45,16 @@ public class TableDinner {
         tableDinnerDto.setEateryId(eatery.getId());
         tableDinnerDto.setStatus(status);
         tableDinnerDto.setDescription(description);
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        for(Order order : orderList){
+            orderDtoList.add(order.toDto());
+        }
+        tableDinnerDto.setOrderDtoList(orderDtoList);
+        List<NotifyDto> notifyDtoList = new ArrayList<>();
+        for(Notify notify : notifyList){
+            notifyDtoList.add(notify.toDto());
+        }
+        tableDinnerDto.setNotifyDtoList(notifyDtoList);
         return tableDinnerDto;
     }
 }

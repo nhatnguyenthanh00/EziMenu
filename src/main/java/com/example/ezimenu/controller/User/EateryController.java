@@ -4,10 +4,10 @@ import com.example.ezimenu.dto.EateryDto;
 import com.example.ezimenu.entity.Eatery;
 import com.example.ezimenu.entity.User;
 import com.example.ezimenu.service.serviceimpl.EateryService;
+import com.example.ezimenu.service.transer.MapperService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class UserController {
+public class EateryController {
     @Autowired
     HttpServletRequest request;
     @Autowired
     EateryService eateryService;
+    @Autowired
+    MapperService mapperService;
 
     @GetMapping(value = "/eateries")
     public ResponseEntity<List<EateryDto>> eateryPage(){
@@ -29,12 +31,7 @@ public class UserController {
         List<Eatery> eateryList = eateryService.findAllByUserId(user.getId());
         List<EateryDto> eateryDtoList = new ArrayList<>();
         for (Eatery eatery : eateryList) {
-            EateryDto eateryDto = new EateryDto();
-            eateryDto.setId(eatery.getId());
-            eateryDto.setUserId(eatery.getUser().getId());
-            eateryDto.setAddress(eatery.getAddress());
-            eateryDto.setDescription(eatery.getDescription());
-            eateryDtoList.add(eateryDto);
+            eateryDtoList.add(eatery.toDto());
         }
         return ResponseEntity.ok(eateryDtoList);
     }
@@ -43,36 +40,32 @@ public class UserController {
     public ResponseEntity<?> getEateryById(@PathVariable int id){
         Eatery eatery = eateryService.findById(id);
         if(eatery==null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Id not existed.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Eatery not existed.");
         }
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if(eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this eatery.");
         }
-        EateryDto eateryDto = new EateryDto();
-        eateryDto.setId(eatery.getId());
-        eateryDto.setUserId(eatery.getUser().getId());
-        eateryDto.setAddress(eatery.getAddress());
-        eateryDto.setDescription(eatery.getDescription());
-        return ResponseEntity.status(HttpStatus.OK).body(eateryDto);
+        return ResponseEntity.status(HttpStatus.OK).body(eatery.toDto());
     }
 
-    @PostMapping(value = "/add-eatery")
-    public ResponseEntity<String> addEatery(@RequestBody Eatery eatery){
+    @PostMapping(value = "/eatery/add")
+    public ResponseEntity<?> addEatery(@RequestBody EateryDto eateryDto){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         List<Eatery> eateryList = eateryService.findAllByUserId(user.getId());
         if(eateryList.size()==1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Just can add only one eatery.");
         }
-        String address = eatery.getAddress();
-        String description = eatery.getDescription();
+        String address = eateryDto.getAddress();
+        String description = eateryDto.getDescription();
         if(address == null || description == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Need to fill in all information.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The request body contains invalid data.");
         }
-        eatery.setUser(user);
+        Eatery eatery = mapperService.toEatery(eateryDto);
         eateryService.saveEatery(eatery);
-        return ResponseEntity.ok("Add new eatery successful.");
+        eateryDto.setId(eatery.getId());
+        return ResponseEntity.ok(eateryDto);
     }
 }

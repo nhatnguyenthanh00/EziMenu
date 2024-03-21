@@ -1,5 +1,6 @@
 package com.example.ezimenu.entity;
 
+import com.example.ezimenu.dto.EateryDto;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,14 @@ public class Eatery {
 
     @OneToMany(mappedBy = "eatery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TableDinner> tableDinnerList;
+
+    public EateryDto toDto(){
+        EateryDto eateryDto = new EateryDto();
+        eateryDto.setId(id);
+        eateryDto.setUserId(user.getId());
+        eateryDto.setAddress(address);
+        eateryDto.setDescription(description);
+        return eateryDto;
+    }
 
 }

@@ -76,7 +76,7 @@ public class GuestController {
     }
 
     @GetMapping(value = "/orders/table-dinner/{tableDinnerId}")
-    public ResponseEntity<?> getOrderPendingByTableDinnerId(@PathVariable int tableDinnerId){
+    public ResponseEntity<?> getOrderByTableDinnerId(@PathVariable int tableDinnerId){
         TableDinner tableDinner = tableDinnerService.findById(tableDinnerId);
         if(tableDinner == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not found eatery.");
@@ -109,12 +109,27 @@ public class GuestController {
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
+    @PutMapping(value = "/order/{id}/update")
+    public ResponseEntity<?> updateOrder(@PathVariable int id,@RequestBody OrderDto orderDto){
+        Order order = orderService.findById(id);
+        if(order == null ){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found order.");
+        }
+        if(order.getStatus()!=-1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't update because order has sent.");
+        }
+        String description = orderDto.getDescription();
+        order.setDescription(description);
+        orderService.saveOrder(order);
+        return ResponseEntity.status(HttpStatus.OK).body(order.toDto());
+    }
+
     @PostMapping(value = "/order-item/add")
     public ResponseEntity<?> addOrderItemById(@RequestBody OrderItemDto orderItemDto){
         int orderId = orderItemDto.getOrderId();
         int dishId = orderItemDto.getDishId();
         int quantity = orderItemDto.getQuantity();
-
+        System.out.println("????");
 
         Order order = orderService.findById(orderId);
         if(order == null){
@@ -137,6 +152,12 @@ public class GuestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't add because order and dish not same eatery.");
         }
         OrderItem existOrderItem = orderItemService.findByOrderIdAndDishId(orderId,dishId);
+        System.out.println("hahaha");
+        System.out.println("total first "+ order.getTotalPrice());
+        System.out.println("add "+quantity* dishService.findById(dishId).getPrice());
+        order.setTotalPrice(order.getTotalPrice() + quantity* dishService.findById(dishId).getPrice());
+        System.out.println("total after"+ order.getTotalPrice());
+
         if(existOrderItem == null){
             OrderItem orderItem = mapperService.toOrderItem(orderItemDto);
             orderItemService.saveOrderItem(orderItem);
@@ -162,6 +183,8 @@ public class GuestController {
         if(quantity < 1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quantity must greater 0.");
         }
+        Order order = orderItem.getOrder();
+        order.setTotalPrice(order.getTotalPrice() + (quantity - orderItem.getQuantity()) * orderItem.getDish().getPrice());
         orderItem.setQuantity(quantity);
         orderItemService.saveOrderItem(orderItem);
         return ResponseEntity.status(HttpStatus.OK).body(orderItem.toDto());
@@ -176,6 +199,8 @@ public class GuestController {
         if(orderItem.getOrder().getStatus()!=-1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't delete because order has sent.");
         }
+        Order order = orderItem.getOrder();
+        order.setTotalPrice(order.getTotalPrice() - orderItem.getQuantity() * orderItem.getDish().getPrice());
         boolean kt = orderItemService.deleteById(id);
 
         return ResponseEntity.status(HttpStatus.OK).body("Delete order item successful.");

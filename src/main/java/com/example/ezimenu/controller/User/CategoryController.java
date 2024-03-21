@@ -8,8 +8,10 @@ import com.example.ezimenu.entity.User;
 import com.example.ezimenu.repository.ICategoryRepository;
 import com.example.ezimenu.service.serviceimpl.CategoryService;
 import com.example.ezimenu.service.serviceimpl.EateryService;
+import com.example.ezimenu.service.transer.MapperService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,75 +29,94 @@ public class CategoryController {
     CategoryService categoryService;
     @Autowired
     EateryService eateryService;
+    @Autowired
+    MapperService mapperService;
     @GetMapping(value = "/eatery/{id}/categories")
     public ResponseEntity<?> categoryPage(@PathVariable int id){
         Eatery eatery = eateryService.findById(id);
-
         if(eatery==null){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found eatery.");
         }
         List<Category> categoryList = categoryService.findAllByEateryId(id);
         List<CategoryDto> categoryDtoList = new ArrayList<>();
         for(Category category : categoryList){
-            CategoryDto categoryDto = new CategoryDto();
-            categoryDto.setId(category.getId());
-            categoryDto.setEateryId(category.getEatery().getId());
-            categoryDto.setName(category.getName());
-            categoryDtoList.add(categoryDto);
+            categoryDtoList.add(category.toDto());
         }
         return ResponseEntity.ok(categoryDtoList);
     }
-    @GetMapping(value = "/eatery/{id}/category/{cateid}")
-    public ResponseEntity<?> getCategoryById(@PathVariable int id, @PathVariable int cateid){
+    @GetMapping(value = "/category/{id}")
+    public ResponseEntity<?> getCategoryById(@PathVariable int id){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        Eatery eatery = eateryService.findById(id);
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
-        }
         Category category = categoryService.findById(id);
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setEateryId(category.getEatery().getId());
-        categoryDto.setName(category.getName());
-        return ResponseEntity.ok(categoryDto);
+        if(category == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found category.");
+        }
+        if(category.getEatery().getUser().getId()!= user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't access this category.");
+        }
+        return ResponseEntity.ok(category.toDto());
     }
-    @PostMapping(value = "/eatery/{id}/category/add")
-    public ResponseEntity<?> addCategory(@PathVariable int id, @RequestBody Category category){
+    @PostMapping(value = "/category/add")
+    public ResponseEntity<?> addCategory(@Valid  @RequestBody CategoryDto categoryDto){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        Eatery eatery = eateryService.findById(id);
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        int eateryId = categoryDto.getEateryId();
+        Eatery eatery = eateryService.findById(eateryId);
+        if(eatery==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Add fail. Not found eatery.");
         }
-        category.setEatery(eatery);
+        if(eatery.getUser().getId()!= user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Add fail. You can't access this eatery.");
+        }
+        String name = categoryDto.getName();
+        if(name.trim().isEmpty()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Add fail. Name can't be empty.");
+        }
+        Category existedCategory = categoryService.findCategoryByEateryIdAndName(eateryId,name);
+        if(existedCategory!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Add fail. This category existed.");
+        }
+        Category category = mapperService.toCategory(categoryDto);
         categoryService.saveCategory(category);
-        return ResponseEntity.status(HttpStatus.OK).body("Add category successful.");
+        categoryDto.setId(category.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(categoryDto);
 
     }
-    @PutMapping(value = "/eatery/{id}/category/{cateid}/update")
-    public ResponseEntity<?> addCategory(@PathVariable int id, @PathVariable int cateid, @RequestBody Category category) {
+    @PutMapping(value = "/category/{id}/update")
+    public ResponseEntity<?> addCategory(@PathVariable int id, @Valid @RequestBody CategoryDto categoryDto) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        Eatery eatery = eateryService.findById(id);
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        Category category = categoryService.findById(id);
+        if(category == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Update fail. Not found category.");
         }
-        Category updateCategory = categoryService.findById(cateid);
-        updateCategory.setName(category.getName());
-        categoryService.saveCategory(updateCategory);
-        return ResponseEntity.status(HttpStatus.OK).body("Update category successful.");
+        if(category.getEatery().getUser().getId()!= user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Update fail. You can't access this category.");
+        }
+        int eateryId = category.getEatery().getId();
+        String name = categoryDto.getName();
+        Category existedCategory = categoryService.findCategoryByEateryIdAndName(eateryId,name);
+        if(existedCategory!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update fail. This category existed.");
+        }
+        category.setName(name);
+        categoryService.saveCategory(category);
+        return ResponseEntity.status(HttpStatus.OK).body(category.toDto());
     }
 
-    @DeleteMapping(value = "/eatery/{id}/category/{cateid}/delete")
-    public ResponseEntity<?> deleteCategory(@PathVariable int id, @PathVariable int cateid){
+    @DeleteMapping(value = "/category/{id}/delete")
+    public ResponseEntity<?> deleteCategory(@PathVariable int id){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        Eatery eatery = eateryService.findById(id);
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        Category category = categoryService.findById(id);
+        if(category == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete fail. Not found category.");
         }
-        boolean kt = categoryService.deleteById(cateid);
+        if(category.getEatery().getUser().getId()!= user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete fail. You can't access this category.");
+        }
+        boolean kt = categoryService.deleteById(id);
         if(kt == false)
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Delete fail.");
         return ResponseEntity.status(HttpStatus.OK).body("Delete successful.");
