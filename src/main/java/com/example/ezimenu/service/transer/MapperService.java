@@ -59,6 +59,9 @@ public class MapperService {
 
     public Notify toNotify(NotifyDto notifyDto){
         Notify notify = new Notify();
+        notify.setType(notifyDto.getType());
+        notify.setDescription(notifyDto.getDescription());
+        notify.setTableDinner(tableDinnerService.findById(notifyDto.getTableDinnerId()));
         return notify;
     }
 }

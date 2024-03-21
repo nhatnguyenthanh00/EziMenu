@@ -26,7 +26,7 @@ public class Notify {
     @ManyToOne
     @JoinColumn(name = "table_dinner_id")
     TableDinner tableDinner;
-    private int type;
+    private Integer type;
     // type = -1 -> Request Confirm Order
     // type =  0 -> Request Payment
     // type =  1 -> Request Support
