@@ -33,13 +33,11 @@ public class DishController {
     @Autowired
     DishService dishService;
     @GetMapping(value = "/eatery/{id}/dishes")
-    public ResponseEntity<?> dishPageByEatery(@PathVariable int id){
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+    public ResponseEntity<?> getAllDishByEatery(@PathVariable int id){
         Eatery eatery = eateryService.findById(id);
 
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(eatery==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found eatery.");
         }
 
         List<Dish> dishList = dishService.findAllByEateryId(id);
@@ -52,12 +50,10 @@ public class DishController {
 
     @GetMapping(value = "/category/{id}/dishes")
     public ResponseEntity<?> dishPageByCategory(@PathVariable int id){
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
         Category category = categoryService.findById(id);
 
-        if(category==null || category.getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(category==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found category.");
         }
 
         List<Dish> dishList = dishService.findAllByCategoryId(id);

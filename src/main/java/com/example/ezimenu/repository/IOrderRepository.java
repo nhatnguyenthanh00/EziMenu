@@ -18,4 +18,7 @@ public interface IOrderRepository extends JpaRepository<Order, Integer> {
 
     @Query("SELECT o FROM Order o JOIN o.tableDinner t WHERE t.id = :tableDinnerId")
     List<Order> findAllByTableDinnerId(@Param("tableDinnerId") int tableDinnerId);
+
+    @Query(value = "SELECT o FROM Order o WHERE o.tableDinner.id =:tableDinnerId AND o.status= :status")
+    List<Order> findAllByTableDinnerIdAndStatus(@Param("tableDinnerId")int tableDinnerId, @Param("status")int status);
 }

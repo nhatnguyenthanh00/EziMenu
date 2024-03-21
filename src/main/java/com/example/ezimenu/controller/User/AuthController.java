@@ -55,6 +55,14 @@ public class AuthController {
         }
         return ResponseEntity.ok("Logout successful.");
     }
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.ok("Test này.");
+    }
     @PostMapping(value = "/signup")
     public ResponseEntity<String> signup(@RequestBody User user){
         String username = user.getUsername();

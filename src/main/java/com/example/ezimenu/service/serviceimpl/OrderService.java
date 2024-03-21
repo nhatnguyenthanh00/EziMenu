@@ -1,5 +1,6 @@
 package com.example.ezimenu.service.serviceimpl;
 
+import com.example.ezimenu.entity.Eatery;
 import com.example.ezimenu.entity.Order;
 import com.example.ezimenu.repository.IOrderRepository;
 import com.example.ezimenu.service.IOrderService;
@@ -28,6 +29,11 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    public List<Order> findAllByTableDinnerIdAndStatus(int tableDinnerId, int status){
+        return orderRepository.findAllByTableDinnerIdAndStatus(tableDinnerId,status);
+    }
+
+    @Override
     public Order saveOrder(Order order){
         return orderRepository.save(order);
     }
@@ -39,4 +45,5 @@ public class OrderService implements IOrderService {
         orderRepository.deleteById(id);
         return true;
     }
+
 }

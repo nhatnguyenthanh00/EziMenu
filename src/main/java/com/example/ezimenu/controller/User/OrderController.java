@@ -65,6 +65,15 @@ public class OrderController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(orderDtoList);
     }
+    @GetMapping(value = "/table/{id}/orders/{status}")
+    public ResponseEntity<?> getAllOrderByTableIdAndStatus(@PathVariable int id,@PathVariable int status){
+        List<Order> orderList = orderService.findAllByTableDinnerIdAndStatus(id,status);
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        for(Order order : orderList){
+            orderDtoList.add(order.toDto());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(orderDtoList);
+    }
 
     @GetMapping(value = "/order/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable int id){
@@ -85,6 +94,8 @@ public class OrderController {
         orderService.saveOrder(order);
         return ResponseEntity.status(HttpStatus.OK).body(order.toDto());
     }
+
+
 
     @GetMapping(value = "/order/detail/{id}")
     public ResponseEntity<?> getOrderDetailById(@PathVariable int id){

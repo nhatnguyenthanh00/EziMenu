@@ -1,11 +1,15 @@
 package com.example.ezimenu.entity;
 
 import com.example.ezimenu.dto.OrderDto;
+import com.example.ezimenu.dto.OrderItemDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,6 +39,9 @@ public class Order {
     @Column(name = "total_price")
     private int totalPrice = 0 ;
 
+    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItemList = new ArrayList<>();
+
     public OrderDto toDto(){
         OrderDto orderDto = new OrderDto();
         orderDto.setId(id);
@@ -42,6 +49,11 @@ public class Order {
         orderDto.setDescription(description);
         orderDto.setStatus(status);
         orderDto.setTotalPrice(totalPrice);
+        List<OrderItemDto> orderItemDtoList = new ArrayList<>();
+        for(OrderItem orderItem : this.orderItemList){
+            orderItemDtoList.add(orderItem.toDto());
+        }
+        orderDto.setOrderItemDtoList(orderItemDtoList);
         return orderDto;
     }
 }

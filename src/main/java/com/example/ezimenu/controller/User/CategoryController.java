@@ -29,11 +29,9 @@ public class CategoryController {
     EateryService eateryService;
     @GetMapping(value = "/eatery/{id}/categories")
     public ResponseEntity<?> categoryPage(@PathVariable int id){
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
         Eatery eatery = eateryService.findById(id);
 
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
+        if(eatery==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
         }
         List<Category> categoryList = categoryService.findAllByEateryId(id);

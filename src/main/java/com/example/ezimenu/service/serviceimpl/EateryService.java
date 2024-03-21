@@ -26,4 +26,9 @@ public class EateryService implements IEateryService {
     public Eatery findById(int id){
         return eateryRepository.findById(id);
     }
+
+    @Override
+    public Eatery findByTableDinnerId(int tableDinnerId){
+        return eateryRepository.findByTableDinnerId(tableDinnerId);
+    }
 }

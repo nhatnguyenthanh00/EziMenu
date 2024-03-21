@@ -120,7 +120,7 @@ INSERT INTO `ezimenu_db`.`table_dinner` (`eatery_id`, `status`, `description`) V
 
 -- Chèn dữ liệu mẫu vào bảng Order
 INSERT INTO `ezimenu_db`.`order_table` (`table_dinner_id`, `description`, `status`, `total_price`) VALUES
-(1, 'Đơn hàng số 1', -1, 0),
+(1, 'Đơn hàng số 1', -1, 120000),
 (2, 'Đơn hàng số 2', -1, 0),
 (3, 'Đơn hàng số 3', -1, 0);
 
