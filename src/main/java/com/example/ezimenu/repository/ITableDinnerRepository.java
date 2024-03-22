@@ -10,4 +10,6 @@ public interface ITableDinnerRepository extends JpaRepository<TableDinner, Integ
     List<TableDinner> findAllByEateryId(int eateryId);
 
     TableDinner findById(int id);
+
+    TableDinner findTableDinnerByEatery_IdAndAndDescription(int eateryId, String description);
 }

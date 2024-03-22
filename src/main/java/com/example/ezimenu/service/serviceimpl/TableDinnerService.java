@@ -35,4 +35,9 @@ public class TableDinnerService implements ITableDinnerService {
         tableDinnerRepository.deleteById(id);
         return true;
     }
+
+    @Override
+    public     TableDinner findTableDinnerByEateryIdAndAndDescription(int eateryId, String description){
+        return tableDinnerRepository.findTableDinnerByEatery_IdAndAndDescription(eateryId,description);
+    }
 }

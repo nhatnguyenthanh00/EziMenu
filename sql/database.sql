@@ -103,7 +103,7 @@ INSERT INTO `ezimenu_db`.`category` (`eatery_id`, `name`) VALUES
 INSERT INTO `ezimenu_db`.`dish` (`category_id`, `name`, `price`, `status`) VALUES
 (1, 'Bún bò Huế đặc biệt', 45000, true),
 (1, 'Bún chả Hà Nội', 30000, true),
-(2, 'Phở Bò Nam Định', 34000, true),
+(2, 'Phở Bò Nam Định', 35000, true),
 (2, 'Phở Gà Gia Truyền', 50000, true),
 (3, 'Xúc xích', 10000, true),
 (3, 'Cánh Gà rán', 40000, true),
@@ -121,7 +121,7 @@ INSERT INTO `ezimenu_db`.`table_dinner` (`eatery_id`, `status`, `description`) V
 -- Chèn dữ liệu mẫu vào bảng Order
 INSERT INTO `ezimenu_db`.`order_table` (`table_dinner_id`, `description`, `status`, `total_price`) VALUES
 (1, 'Đơn hàng số 1', -1, 120000),
-(2, 'Đơn hàng số 2', -1, 0),
+(2, 'Đơn hàng số 2', -1, 320000),
 (3, 'Đơn hàng số 3', -1, 0);
 
 -- Chèn dữ liệu mẫu vào bảng OrderItem

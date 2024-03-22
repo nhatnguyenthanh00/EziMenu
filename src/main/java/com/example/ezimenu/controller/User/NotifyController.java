@@ -35,8 +35,11 @@ public class NotifyController {
         User user = (User) session.getAttribute("user");
         Eatery eatery = eateryService.findById(id);
 
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
+        if(eatery==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        }
+        if(eatery.getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this eatery.");
         }
         List<Notify> notifyList = notifyService.findAllByEateryId(id);
         List<NotifyDto> notifyDtoList = new ArrayList<>();
@@ -51,8 +54,11 @@ public class NotifyController {
         User user = (User) session.getAttribute("user");
         TableDinner tableDinner = tableDinnerService.findById(id);
 
-        if(tableDinner==null || tableDinner.getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(tableDinner==null ){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found table dinner.");
+        }
+        if(tableDinner.getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this table dinner.");
         }
         List<Notify> notifyList = notifyService.findAllByTableDinnerId(id);
         List<NotifyDto> notifyDtoList = new ArrayList<>();
@@ -67,8 +73,11 @@ public class NotifyController {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         Notify notify = notifyService.findById(id);
-        if(notify == null || notify.getTableDinner().getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(notify == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found notify.");
+        }
+        if(notify.getTableDinner().getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this notify.");
         }
         return ResponseEntity.status(HttpStatus.OK).body(notify.toDto());
     }

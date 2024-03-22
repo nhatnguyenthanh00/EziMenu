@@ -12,4 +12,6 @@ public interface ITableDinnerService {
     TableDinner findById(int id);
 
     boolean deleteById(int id);
+
+    TableDinner findTableDinnerByEateryIdAndAndDescription(int eateryId, String description);
 }

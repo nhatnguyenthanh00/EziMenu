@@ -121,15 +121,31 @@ public class DishController {
         }
         String name = dishDto.getName();
         int price = dishDto.getPrice();
-        boolean status = dishDto.isStatus();
         Dish existedDish = dishService.findDishByCategoryAndNameAndPrice(updateCategory,name,price);
         if (existedDish != null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dish existed.");
         }
         dish.setName(name);
         dish.setPrice(price);
-        dish.setStatus(status);
         dish.setCategory(updateCategory);
+        dishService.saveDish(dish);
+        return ResponseEntity.status(HttpStatus.OK).body(dish.toDto());
+    }
+
+    @PutMapping(value = "/dish/{dishid}/update-status")
+    public ResponseEntity<?> updateDishStatus(@PathVariable int dishid){
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        Dish dish = dishService.findById(dishid);
+        if(dish==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found dish.");
+        }
+        if(dish.getCategory().getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't access this eatery.");
+        }
+
+        boolean status = dish.isStatus();
+        dish.setStatus(!status);
         dishService.saveDish(dish);
         return ResponseEntity.status(HttpStatus.OK).body(dish.toDto());
     }

@@ -2,6 +2,7 @@ package com.example.ezimenu.dto;
 
 import com.example.ezimenu.entity.Eatery;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,8 @@ import java.util.List;
 @Setter
 public class TableDinnerDto {
     private int id;
-
-    private int eateryId;
+    @NotNull
+    private Integer eateryId;
     private boolean status = true;
     private String description;
     private List<OrderDto> orderDtoList = new ArrayList<>();
