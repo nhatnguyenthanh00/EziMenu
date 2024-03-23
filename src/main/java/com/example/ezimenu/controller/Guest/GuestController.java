@@ -42,7 +42,8 @@ public class GuestController {
         return ResponseEntity.status(HttpStatus.OK).body("Test Guest");
     }
     @GetMapping(value = "/menu/table-dinner/{tableDinnerId}")
-    public ResponseEntity<?> getMenu(@PathVariable int tableDinnerId) {
+    public ResponseEntity<?> getMenu(@PathVariable int tableDinnerId, @RequestParam(name = "search", defaultValue = "") String search,
+                                     @RequestParam(name = "cateId", defaultValue = "0") Integer cateId) {
         Eatery eatery = eateryService.findByTableDinnerId(tableDinnerId);
         if(eatery == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have no access.");
@@ -110,7 +111,7 @@ public class GuestController {
     }
 
     @PutMapping(value = "/order/{id}/update")
-    public ResponseEntity<?> updateOrder(@PathVariable int id,@RequestBody OrderDto orderDto){
+    public ResponseEntity<?> updateOrder(@PathVariable int id,@RequestParam(name = "description") String description){
         Order order = orderService.findById(id);
         if(order == null ){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found order.");
@@ -118,7 +119,6 @@ public class GuestController {
         if(order.getStatus()!=-1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't update because order has sent.");
         }
-        String description = orderDto.getDescription();
         order.setDescription(description);
         orderService.saveOrder(order);
         return ResponseEntity.status(HttpStatus.OK).body(order.toDto());
@@ -206,36 +206,7 @@ public class GuestController {
         return ResponseEntity.status(HttpStatus.OK).body("Delete order item successful.");
     }
 
-    @PostMapping(value = "/notify/add")
-    public ResponseEntity<?> addNotify(@Valid @RequestBody NotifyDto notifyDto){
-        int tableDinnerId = notifyDto.getTableDinnerId();
-        TableDinner tableDinner = tableDinnerService.findById(tableDinnerId);
-        if(tableDinner == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not found table.");
-        }
-        // nếu chưa chọn món --> ko thể gửi notify type = -1
-        List<Order> orderPendingList = orderService.findAllByTableDinnerIdAndStatus(tableDinnerId,-1);
-        Order orderPending = new Order();
-        if(orderPendingList.isEmpty()){
-            orderPending.setTableDinner(tableDinner);
-            orderService.saveOrder(orderPending);
-        }
-        else orderPending = orderPendingList.get(0);
-        if(orderPending.getOrderItemList().size() == 0){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please choose dishes first.");
-        }
 
-        // nếu món chưa ra hết --> chưa thể thanh toán -> ko thể gửi notify = 0
-        List<Order> orderSentList = orderService.findAllByTableDinnerIdAndStatus(tableDinnerId,0);
-        if (orderSentList.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please wait until all dishes served.");
-        }
-
-        Notify notify = mapperService.toNotify(notifyDto);
-        notifyService.saveNotify(notify);
-        notifyDto.setId(notify.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(notifyDto);
-    }
 
 
 

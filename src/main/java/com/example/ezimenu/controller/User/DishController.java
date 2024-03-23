@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class DishController {
@@ -33,7 +34,9 @@ public class DishController {
     @Autowired
     DishService dishService;
     @GetMapping(value = "/eatery/{id}/dishes")
-    public ResponseEntity<?> getAllDishByEatery(@PathVariable int id){
+    public ResponseEntity<?> getAllDishByEatery(@PathVariable int id,
+                                                @RequestParam(name = "search", defaultValue = "") String search,
+                                                @RequestParam(name = "cateId", defaultValue = "0") Integer cateId){
         Eatery eatery = eateryService.findById(id);
 
         if(eatery==null){
@@ -41,6 +44,14 @@ public class DishController {
         }
 
         List<Dish> dishList = dishService.findAllByEateryId(id);
+        dishList =  dishList.stream()
+                .filter(dish -> dish.getName().toLowerCase().contains(search.toLowerCase()))
+                .collect(Collectors.toList());
+        if(cateId!=0) {
+            dishList = dishList.stream()
+                    .filter(dish -> dish.getCategory().getId() == cateId)
+                    .collect(Collectors.toList());
+        }
         List<DishDto> dishDtoList = new ArrayList<>();
         for(Dish dish : dishList){
             dishDtoList.add(dish.toDto());

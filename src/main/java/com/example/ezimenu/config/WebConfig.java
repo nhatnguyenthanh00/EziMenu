@@ -25,6 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/category/{id}/dishes")
                 .excludePathPatterns("/dish/{id}")
                 .excludePathPatterns("/table/{id}/orders/{status}")
+                .excludePathPatterns("/notify/add")
                 .excludePathPatterns("/guest/**");
     }
 

@@ -39,6 +39,16 @@ public class TableDinner {
     @OneToMany(mappedBy = "tableDinner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notify> notifyList;
 
+    public String createSuperStatus(){
+        if(status == false) return "Bàn trống";
+        List<Order> orderSentList = new ArrayList<>();
+        for(Order order : orderList){
+            if(order.getStatus()==0) orderSentList.add(order);
+        }
+        if(orderSentList.isEmpty()) return "Đang gọi món";
+        return  "Đang chờ món";
+    }
+
     public TableDinnerDto toDto(){
         TableDinnerDto tableDinnerDto = new TableDinnerDto();
         tableDinnerDto.setId(id);

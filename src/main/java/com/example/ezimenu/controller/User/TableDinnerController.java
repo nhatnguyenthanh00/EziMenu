@@ -127,7 +127,7 @@ public class TableDinnerController {
     }
 
     @DeleteMapping(value = "/table-dinner/{tableDinnerId}/delete")
-    public ResponseEntity<?> deleteTableDinner(@PathVariable int id, @PathVariable int tableDinnerId){
+    public ResponseEntity<?> deleteTableDinner(@PathVariable int tableDinnerId){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         TableDinner tableDinner = tableDinnerService.findById(tableDinnerId);

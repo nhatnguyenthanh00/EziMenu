@@ -8,6 +8,7 @@ import com.example.ezimenu.service.serviceimpl.*;
 import com.example.ezimenu.service.transer.MapperService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +39,11 @@ public class OrderController {
         User user = (User) session.getAttribute("user");
         Eatery eatery = eateryService.findById(id);
 
-        if(eatery==null || eatery.getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(eatery==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found eatery.");
+        }
+        if(eatery.getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this eatery.");
         }
 
         List<Order> orderList = orderService.findAllByEateryId(id);
@@ -96,32 +100,17 @@ public class OrderController {
     }
 
 
-
-    @GetMapping(value = "/order/detail/{id}")
-    public ResponseEntity<?> getOrderDetailById(@PathVariable int id){
-        HttpSession session = request.getSession();
-        int userId = ((User) session.getAttribute("user")).getId();
-        Order order = orderService.findById(id);
-
-        if(order==null || order.getTableDinner().getEatery().getUser().getId()!=userId){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
-        }
-        List<OrderItem> orderItemList = orderItemService.findAllByOrderId(id);
-        List<OrderItemDto> orderItemDtoList = new ArrayList<>();
-        for(OrderItem orderItem : orderItemList){
-            orderItemDtoList.add(orderItem.toDto());
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(orderItemDtoList);
-    }
-
     @PostMapping(value = "/order/add")
-    public ResponseEntity<?> addOrder(@RequestBody OrderDto orderDto){
+    public ResponseEntity<?> addOrder(@Valid  @RequestBody OrderDto orderDto){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        TableDinner tableDinner = tableDinnerService.findById(orderDto.getTableDinnerId());
-        if(tableDinner==null || tableDinner.getEatery().getUser().getId()!=user.getId()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        int tableDinnerId = orderDto.getTableDinnerId();
+        TableDinner tableDinner = tableDinnerService.findById(tableDinnerId);
+        if(tableDinner==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found table dinner.");
+        }
+        if(tableDinner.getEatery().getUser().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this eatery.");
         }
 
         Order order = mapperService.toOrder(orderDto);
@@ -130,21 +119,26 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderDto);
     }
 
-    @PutMapping(value = "/order/{id}/update")
-    public ResponseEntity<?> updateOrder(@PathVariable int id,@RequestBody OrderDto orderDto){
+    @PutMapping(value = "/order/{id}/update-status")
+    public ResponseEntity<?> updateOrder(@PathVariable int id,@RequestParam(name = "status") Integer status){
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         Order order = orderService.findById(id);
-        if(order == null || order.getTableDinner().getEatery().getId()!=user.getId() ){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(order == null ){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found order.");
         }
-        order.setDescription(orderDto.getDescription());
-        order.setStatus(orderDto.getStatus());
-        order.setTableDinner(tableDinnerService.findById(orderDto.getTableDinnerId()));
+        if(order.getTableDinner().getEatery().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this order.");
+        }
+        if(order.getStatus()==-1 && status==0){
+            TableDinner tableDinner = order.getTableDinner();
+            Order newPendingOrder = new Order();
+            newPendingOrder.setTableDinner(tableDinner);
+            orderService.saveOrder(newPendingOrder);
+        }
+        order.setStatus(status);
         orderService.saveOrder(order);
-        orderDto.setId(id);
-        orderDto.setTotalPrice(order.getTotalPrice());
-        return ResponseEntity.status(HttpStatus.OK).body(orderDto);
+        return ResponseEntity.status(HttpStatus.OK).body(order.toDto());
     }
 
     @DeleteMapping(value = "/order/{id}/delete")
@@ -152,8 +146,11 @@ public class OrderController {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         Order order = orderService.findById(id);
-        if(order == null || order.getTableDinner().getEatery().getId()!=user.getId() ){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access.");
+        if(order == null ){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not found order.");
+        }
+        if(order.getTableDinner().getEatery().getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have access this order.");
         }
         if(order.getStatus() !=-1)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Can not delete, order has been sent.");
